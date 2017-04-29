@@ -1,6 +1,6 @@
 <?php
 //signup.php
-include 'dbmanager.php';
+include_once 'dbmanager.php';
 include 'header.php';
 include 'footer.php';
 session_start();

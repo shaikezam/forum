@@ -70,7 +70,7 @@ class DBConnection {
 
     /* execute query */
 
-    private static function _executeQuery($sql) {
+    public static function _executeQuery($sql) {
         
         if (self::$connectionString == null) {
             self::getDBConnection();
@@ -90,8 +90,8 @@ class DBConnection {
     user_name   VARCHAR(30) NOT NULL,
     user_pass   VARCHAR(255) NOT NULL,
     user_email  VARCHAR(255) NOT NULL,
-    user_date   DATETIME NOT NULL,
-    user_level  INT(8) NOT NULL,
+    user_date   DATETIME NOT NULL DEFAULT NOW(),
+    user_level  VARCHAR(255) NOT NULL,
     UNIQUE INDEX user_name_unique (user_name),
     PRIMARY KEY (user_id)
 ) Engine=InnoDB');
