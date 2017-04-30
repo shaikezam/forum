@@ -5,7 +5,7 @@ class DBConnection {
     protected static $server = 'localhost';
     protected static $user = 'root';
     protected static $password = '';
-    protected static $db = 'myforum1';
+    protected static $db = 'myforum';
     protected static $connectionString;
 
     /* setters & getters */
@@ -110,6 +110,7 @@ class DBConnection {
     user_date   DATETIME NOT NULL DEFAULT NOW(),
     user_level  VARCHAR(255) NOT NULL,
     UNIQUE INDEX user_name_unique (user_name),
+    UNIQUE INDEX user_email_unique (user_email),
     PRIMARY KEY (user_id)
 ) Engine=InnoDB');
 
