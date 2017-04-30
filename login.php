@@ -4,6 +4,7 @@
 include 'dbmanager.php';
 include 'header.php';
 include 'footer.php';
+include 'utils.php';
 session_start();
 //session_destroy();
 
@@ -22,5 +23,17 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         return;
     }
 } else {
-    
+    if (isset($_POST['user_name']) && isset($_POST['user_pass'])) {
+        $username = $_POST['user_name'];
+        $user_pass = $_POST['user_pass'];
+        $is_valid = Utils::ValidateLoginDetails($username, $user_pass);
+        if ($is_valid === true) {
+            $_SESSION["logged"] = $username;
+            header('Location: index.php');
+        } else if ($is_valid === false){
+            Utils::Logger(Utils::USER_NOT_FOUND);
+        } else {
+            Utils::Logger(Utils::DEFAULT_ERROR_MSG);
+        }
+    }
 }

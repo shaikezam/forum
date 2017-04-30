@@ -31,6 +31,5 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         $user_pass_check = $_POST['user_pass_check'];
         $user_email = $_POST['user_email'];
         $is_valid = Utils::ValidateRegisterDetails($username, $user_pass, $user_pass_check, $user_email);
-        Utils::Logger($is_valid);
     }
 }

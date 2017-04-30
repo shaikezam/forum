@@ -5,7 +5,7 @@ class DBConnection {
     protected static $server = 'localhost';
     protected static $user = 'root';
     protected static $password = '';
-    protected static $db = 'myforum';
+    protected static $db = 'myforum1';
     protected static $connectionString;
 
     /* setters & getters */
@@ -54,7 +54,7 @@ class DBConnection {
 
             $db_selected = mysqli_select_db(self::$connectionString, self::getDB());
             if (!$db_selected) {
-                // If we couldn't, then it either doesn't exist, or we can't see it.
+// If we couldn't, then it either doesn't exist, or we can't see it.
                 $sql = 'CREATE DATABASE ' . self::getDB();
                 if (self::$connectionString->query($sql) === TRUE) {
                     echo "Database " . self::getDB() . " created successfully\n";
@@ -71,14 +71,31 @@ class DBConnection {
     /* execute query */
 
     public static function _executeQuery($sql) {
-        
+
         if (self::$connectionString == null) {
             self::getDBConnection();
         }
-        if (self::$connectionString->query($sql) === TRUE) {
+        $res = self::$connectionString->query($sql);
+        if ($res === TRUE) {
             echo "query execute successfully\n"; //table created
         } else {
-            echo "Error creating table: " . self::$connectionString->error . '\n'; //error -> table wont created
+            echo "Error: " . self::$connectionString->error . '\n'; //error -> table wont created
+        }
+    }
+
+    public static function _executeSelectQuery($sql) {
+
+        if (self::$connectionString == null) {
+            self::getDBConnection();
+        }
+        $result = mysqli_query(self::$connectionString, $sql);
+        if (!$result) // error in query
+            echo 'Invalid query: ' . mysqli_error(); //sending error message
+        $numResults = mysqli_num_rows($result);
+        if ($numResults == 0) {
+            return false;
+        } else {
+            return $result;
         }
     }
 
@@ -112,7 +129,7 @@ class DBConnection {
     topic_by        INT(8) NOT NULL,
     PRIMARY KEY (topic_id)
 ) Engine=InnoDB');
-        
+
         self::_executeQuery('CREATE TABLE posts (
     post_id         INT(8) NOT NULL AUTO_INCREMENT,
     post_content        TEXT NOT NULL,
@@ -121,10 +138,10 @@ class DBConnection {
     post_by     INT(8) NOT NULL,
     PRIMARY KEY (post_id)
 ) Engine=InnoDB');
-        //self::_executeQuery('ALTER TABLE ' . self::getDB() . ' topics ADD FOREIGN KEY(topic_cat) REFERENCES  ' . self::getDB() . ' categories(cat_id) ON DELETE CASCADE ON UPDATE CASCADE;');
-        //self::_executeQuery('ALTER TABLE ' . self::getDB() . ' topics ADD FOREIGN KEY(topic_by) REFERENCES  ' . self::getDB() . ' users(user_id) ON DELETE RESTRICT ON UPDATE CASCADE;');
-        //self::_executeQuery('ALTER TABLE ' . self::getDB() . ' posts ADD FOREIGN KEY(post_topic) REFERENCES  ' . self::getDB() . ' topics(topic_id) ON DELETE CASCADE ON UPDATE CASCADE;');
-        //self::_executeQuery('ALTER TABLE ' . self::getDB() . ' posts ADD FOREIGN KEY(post_by) REFERENCES  ' . self::getDB() . ' users(user_id) ON DELETE RESTRICT ON UPDATE CASCADE;');
+//self::_executeQuery('ALTER TABLE ' . self::getDB() . ' topics ADD FOREIGN KEY(topic_cat) REFERENCES  ' . self::getDB() . ' categories(cat_id) ON DELETE CASCADE ON UPDATE CASCADE;');
+//self::_executeQuery('ALTER TABLE ' . self::getDB() . ' topics ADD FOREIGN KEY(topic_by) REFERENCES  ' . self::getDB() . ' users(user_id) ON DELETE RESTRICT ON UPDATE CASCADE;');
+//self::_executeQuery('ALTER TABLE ' . self::getDB() . ' posts ADD FOREIGN KEY(post_topic) REFERENCES  ' . self::getDB() . ' topics(topic_id) ON DELETE CASCADE ON UPDATE CASCADE;');
+//self::_executeQuery('ALTER TABLE ' . self::getDB() . ' posts ADD FOREIGN KEY(post_by) REFERENCES  ' . self::getDB() . ' users(user_id) ON DELETE RESTRICT ON UPDATE CASCADE;');
     }
 
     /* close DB connection */
@@ -134,6 +151,7 @@ class DBConnection {
             mysqli_close(self::$connectionString);
         }
     }
+
 }
 
 ?>

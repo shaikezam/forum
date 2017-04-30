@@ -17,6 +17,12 @@ if($_SERVER['REQUEST_METHOD'] != 'POST')
     if( !isset($_SESSION["logged"]) ){
             echo 'Please <a href="/forum/login.php">log in</a> or <a href="/forum/register.php">register</a>'; 
         return;
+    } else {
+        echo 'Hello ' . $_SESSION["logged"];
+        if ( isset($_SESSION["user_level"]) ) {
+            echo ' <a href="/forum/admin_panel.php">Admin panel</a>';
+        }
+        echo  ' <a href="/forum/logout.php">log out</a>'; 
     }
 }
 else
