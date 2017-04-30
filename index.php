@@ -12,17 +12,15 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     /* the form hasn't been posted yet, display it
       note that the action="" will cause the form to post to the same page it is on */
-    //$_SESSION["logged"] = true;
-    DBConnection::getDBConnection();
     if (!isset($_SESSION["logged"])) {
         echo 'Please <a href="login.php">log in</a> or <a href="register.php">register</a><br><br>';
         //return;
     } else {
-        echo 'Hello ' . $_SESSION["logged"];
+        echo 'Hello ' . $_SESSION["logged"] . ',<br>';
         if (isset($_SESSION["user_level"])) {
-            echo ' <a href="/forum/admin_panel.php">Admin panel</a>';
+            echo ' <a href="admin_panel.php">Admin panel </a>';
         }
-        echo ' <a href="/forum/logout.php">log out</a><br><br>';
+        echo '<a href="control_panel.php">Control panel </a><a href="logout.php">log out</a><br><br>';
     }
     $categories = Utils::getCategories();
     if (!$categories) {
@@ -70,5 +68,4 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         
     }
 }
-DBConnection::closeDBConnection();
 ?>

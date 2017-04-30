@@ -13,5 +13,5 @@
                 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
                 </head>
 
-                <body style='margin-left:15%;margin-right:15%;'>
+    <body style='margin-left:15%;margin-right:15%;'>
                     <h1>My forum</h1>

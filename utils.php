@@ -29,7 +29,7 @@ class Utils {
 
     public static function ValidateLoginDetails($username, $user_pass) {
         if (strlen($username) > self::USER_NAME_MIN_LENGTH && $user_pass) {
-            $res = DBConnection::_executeSelectQuery("SELECT * FROM users where user_name = '$username' and user_pass = '$user_pass'");
+            $res = DBConnection::_executeSelectQuery("SELECT * FROM users where user_name like binary '$username' and user_pass like binary '$user_pass'");
             if ($res === false) {
                 return false;
             } else {
@@ -52,9 +52,9 @@ class Utils {
         if ($res === false) {
             return false;
         } else {
-            $response = '<table class="table table-bordered"><thead><tr><th>Categories</th><th># of topics</th><th># of posts</th></tr></thead><tbody>';
+            $response = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:70%;">Categories</th><th># of topics</th><th># of posts</th></tr></thead><tbody>';
             while ($row = mysqli_fetch_array($res)) { //send back result
-                    $response = $response . '<tr><td><a href="forum_display.php?id=' . $row['cat_id'] . '"><strong>' . $row['cat_name'] . '</strong></a><br>' . $row['cat_description'] . '</td>
+                    $response = $response . '<tr><td><img src="assets/Speech_balloon.svg" alt="Smiley face" height="42" width="42"><a href="forum_display.php?id=' . $row['cat_id'] . '"><strong> ' . $row['cat_name'] . '</strong></a><br>' . $row['cat_description'] . '</td>
                     <td>' . 6666 . '</td>
                     <td>' . 3333 . '</td>
                   </tr>';

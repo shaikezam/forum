@@ -124,7 +124,7 @@ class DBConnection {
         self::_executeQuery('CREATE TABLE topics (
     topic_id        INT(8) NOT NULL AUTO_INCREMENT,
     topic_subject       VARCHAR(255) NOT NULL,
-    topic_date      DATETIME NOT NULL,
+    topic_date      DATETIME NOT NULL DEFAULT NOW(),
     topic_cat       INT(8) NOT NULL,
     topic_by        INT(8) NOT NULL,
     PRIMARY KEY (topic_id)
@@ -133,7 +133,7 @@ class DBConnection {
         self::_executeQuery('CREATE TABLE posts (
     post_id         INT(8) NOT NULL AUTO_INCREMENT,
     post_content        TEXT NOT NULL,
-    post_date       DATETIME NOT NULL,
+    post_date       DATETIME NOT NULL DEFAULT NOW(),
     post_topic      INT(8) NOT NULL,
     post_by     INT(8) NOT NULL,
     PRIMARY KEY (post_id)
