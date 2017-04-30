@@ -54,7 +54,7 @@ class Utils {
         } else {
             $response = '<table class="table table-bordered"><thead><tr><th>Categories</th><th># of topics</th><th># of posts</th></tr></thead><tbody>';
             while ($row = mysqli_fetch_array($res)) { //send back result
-                    $response = $response . '<tr><td><a href="forum_display?id=' . $row['cat_id'] . ' .php">' . $row['cat_name'] . '</a><br>' . $row['cat_description'] . '</td>
+                    $response = $response . '<tr><td><a href="forum_display.php?id=' . $row['cat_id'] . '"><strong>' . $row['cat_name'] . '</strong></a><br>' . $row['cat_description'] . '</td>
                     <td>' . 6666 . '</td>
                     <td>' . 3333 . '</td>
                   </tr>';
