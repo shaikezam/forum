@@ -77,9 +77,9 @@ class DBConnection {
         }
         $res = self::$connectionString->query($sql);
         if ($res === TRUE) {
-            echo "query execute successfully\n"; //table created
+            return true; //table created
         } else {
-            echo "Error: " . self::$connectionString->error . '\n'; //error -> table wont created
+            return self::$connectionString->error; //error -> table wont created
         }
     }
 

@@ -21,6 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
                 <input type="submit" value="log in" id="submitLogin" class="btn btn-default" />
             </form>';
         return;
+    } else {
+        echo '<h3>Already logged in</h3>';
     }
 } else {
     if (isset($_POST['user_name']) && isset($_POST['user_pass'])) {
@@ -31,9 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             $_SESSION["logged"] = $username;
             header('Location: index.php');
         } else if ($is_valid === false){
-            Utils::Logger(Utils::USER_NOT_FOUND);
+            Utils::ThrowErrorLog(Utils::USER_NOT_FOUND);
         } else {
-            Utils::Logger(Utils::DEFAULT_ERROR_MSG);
+            Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);
         }
     }
 }

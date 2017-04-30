@@ -23,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
                 <input type="submit" value="register" id="submitRegister" class="btn btn-default" />
             </form>';
         return;
+    } else {
+        echo '<h3>Already logged in</h3>';
     }
 } else {
     if (isset($_POST['user_name']) && isset($_POST['user_pass']) && isset($_POST['user_pass_check']) && isset($_POST['user_email'])) {
@@ -30,6 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         $user_pass = $_POST['user_pass'];
         $user_pass_check = $_POST['user_pass_check'];
         $user_email = $_POST['user_email'];
-        $is_valid = Utils::ValidateRegisterDetails($username, $user_pass, $user_pass_check, $user_email);
+        $res = Utils::ValidateRegisterDetails($username, $user_pass, $user_pass_check, $user_email);
+        if ($res == '1') {
+            $_SESSION["logged"] = $username;
+            header('Location: index.php');
+        } else {
+            if (0 === strpos($res, 'Duplicate')) {
+                Utils::ThrowErrorLog(Utils::USER_EXISTS);
+                return;
+            }
+            Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);
+        }
     }
 }

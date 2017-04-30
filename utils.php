@@ -8,18 +8,21 @@ class Utils {
     const USER_NOT_FOUND = 'Wrong log in details';
     const ADMIN = 'Admin';
     const DEFAULT_ERROR_MSG = 'An error occurred, please try again';
+    const NOT_AUTHORIZED = 'Not authorized operation';
+    const USER_EXISTS = 'There is user with those details';
 
     public static function Logger($str) {
         echo $str;
     }
 
+    public static function ThrowErrorLog($str) {
+        echo '<div class="alert alert-danger">' . $str . '</div>';
+    }
+
     public static function ValidateRegisterDetails($username, $user_pass, $user_pass_check, $user_email) {
         if (strlen($username) > self::USER_NAME_MIN_LENGTH && $user_pass === $user_pass_check && filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
-            DBConnection::_executeQuery('INSERT INTO users VALUES (DEFAULT,"' . $username . '", "' . $user_pass . '", "' . $user_email . '", DEFAULT, "lo")');
-            self::Logger('good user name');
-            return true;
+            return DBConnection::_executeQuery('INSERT INTO users VALUES (DEFAULT,"' . $username . '", "' . $user_pass . '", "' . $user_email . '", DEFAULT, "lo")');
         } else {
-            self::Logger('bad user name');
             return false;
         }
     }
@@ -37,6 +40,28 @@ class Utils {
                 }
                 return true;
             }
+        }
+    }
+
+    public static function createNewCategory($category_name, $category_description) {
+        return DBConnection::_executeQuery('INSERT INTO categories VALUES (DEFAULT,"' . $category_name . '", "' . $category_description . '")');
+    }
+
+    public static function getCategories() {
+        $res = DBConnection::_executeSelectQuery("SELECT * FROM categories");
+        if ($res === false) {
+            return false;
+        } else {
+            $response = '<table class="table table-bordered"><thead><tr><th>Categories</th><th># of topics</th><th># of posts</th></tr></thead><tbody>';
+            while ($row = mysqli_fetch_array($res)) { //send back result
+                    $response = $response . '<tr><td><a href="forum_display?id=' . $row['cat_id'] . ' .php">' . $row['cat_name'] . '</a><br>' . $row['cat_description'] . '</td>
+                    <td>' . 6666 . '</td>
+                    <td>' . 3333 . '</td>
+                  </tr>';
+            }
+            $response = $response . '</tbody></table>';
+            
+            return $response;
         }
     }
 
