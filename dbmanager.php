@@ -139,6 +139,7 @@ class DBConnection {
     post_by     INT(8) NOT NULL,
     PRIMARY KEY (post_id)
 ) Engine=InnoDB');
+        self::_executeQuery('INSERT INTO users VALUES (DEFAULT, "Admin", "Admin1234", "shaike.zam@gmail.com", DEFAULT, "Admin")');
 //self::_executeQuery('ALTER TABLE ' . self::getDB() . ' topics ADD FOREIGN KEY(topic_cat) REFERENCES  ' . self::getDB() . ' categories(cat_id) ON DELETE CASCADE ON UPDATE CASCADE;');
 //self::_executeQuery('ALTER TABLE ' . self::getDB() . ' topics ADD FOREIGN KEY(topic_by) REFERENCES  ' . self::getDB() . ' users(user_id) ON DELETE RESTRICT ON UPDATE CASCADE;');
 //self::_executeQuery('ALTER TABLE ' . self::getDB() . ' posts ADD FOREIGN KEY(post_topic) REFERENCES  ' . self::getDB() . ' topics(topic_id) ON DELETE CASCADE ON UPDATE CASCADE;');
