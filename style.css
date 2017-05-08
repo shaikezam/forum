@@ -1,3 +1,6 @@
 .hhh {
     width: 70%;
 }
+textarea {
+    resize: none;
+}

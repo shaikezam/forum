@@ -6,7 +6,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="description" content="A short description." />
         <meta name="keywords" content="put, keywords, here" />
-        <title>PHP-MySQL forum</title>
+        <title>Shay Zambrovski FORUM</title>
         <link rel="stylesheet" href="style.css" type="text/css">
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
