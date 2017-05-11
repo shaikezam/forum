@@ -23,8 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             echo ' <a href="admin_panel.php">Admin panel </a>';
         }
         echo '<a href="control_panel.php">Control panel </a><a href="logout.php">log out</a><br>' .
-        '<form method="get" action="new_post.php?id=">' .
-        '<input type="hidden" name="id" value="' . $cat_id . '" />' .
+        '<form method="get" action="new_post.php">' .
+        '<input type="hidden" name="topic_id" value="' . $topic_id . '" />' .
+        '<input type="hidden" name="forum_id" value="' . $cat_id . '" />' .
         '<input type="submit" value="New Post" id="submitLogin" class="btn btn-default" />
             </form><br>';
     }

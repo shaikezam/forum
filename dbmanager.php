@@ -5,7 +5,7 @@ class DBConnection {
     protected static $server = 'localhost';
     protected static $user = 'root';
     protected static $password = '';
-    protected static $db = 'myforum11';
+    protected static $db = 'myforum12';
     protected static $connectionString;
 
     /* setters & getters */
@@ -125,6 +125,7 @@ class DBConnection {
     cat_id          INT(8) NOT NULL AUTO_INCREMENT,
     cat_name        VARCHAR(255) NOT NULL,
     cat_description     VARCHAR(255) NOT NULL,
+    cat_visible BOOLEAN NOT NULL DEFAULT TRUE,
     UNIQUE INDEX cat_name_unique (cat_name),
     PRIMARY KEY (cat_id)
 ) Engine=InnoDB');

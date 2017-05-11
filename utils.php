@@ -11,6 +11,9 @@ class Utils {
     const DEFAULT_ERROR_MSG = 'An error occurred, please try again';
     const NOT_AUTHORIZED = 'Not authorized operation';
     const USER_EXISTS = 'There is user with those details';
+    const CHOOSE_CATEGORY = 'Choose Category';
+    const VISIBLE = 'Visible';
+    const HIDDEN = 'Hidden';
 
     public static function Logger($str) {
         echo $str;
@@ -45,11 +48,13 @@ class Utils {
     }
 
     public static function createNewCategory($category_name, $category_description) {
-        return DBConnection::_executeQuery('INSERT INTO categories VALUES (DEFAULT,"' . $category_name . '", "' . $category_description . '")');
+        //return DBConnection::_executeQuery('INSERT INTO categories VALUES (DEFAULT,"' . $category_name . '", "' . $category_description . ', DEFAULT")');
+        return DBConnection::_executeQuery('INSERT INTO `categories`(`cat_id`, `cat_name`, `cat_description`, `cat_visible`) VALUES (DEFAULT,"' . $category_name . '","' . $category_description . '", DEFAULT)');
+
     }
 
     public static function getCategories() {
-        $res = DBConnection::_executeSelectQuery("SELECT * FROM categories");
+        $res = DBConnection::_executeSelectQuery("SELECT * FROM categories WHERE cat_visible = 1");
         if ($res === false) {
             return false;
         } else {
@@ -156,8 +161,12 @@ class Utils {
         return true;
     }
 
-    public static function CreateNewTopic($topic_subject, $topic_content, $user_name, $cat_id) {
+    public static function ValidateNewPost($post_content, $user_name, $topic_id) {
+        return true;
+    }
 
+    public static function CreateNewTopic($topic_subject, $topic_content, $user_name, $cat_id) {
+        $topic_content = nl2br($topic_content);
         $res = DBConnection::_executeSelectQuery("SELECT * FROM users where user_name = '$user_name' limit 1");
         if ($res === false) {
             return false;
@@ -166,14 +175,52 @@ class Utils {
                 $user_id = $row['user_id'];
                 DBConnection::_executeQuery('INSERT INTO `topics`(`topic_id`, `topic_subject`, `topic_date`, `topic_cat`, `topic_by`) VALUES (DEFAULT,"' . $topic_subject . '",DEFAULT,"' . $cat_id . '","' . $user_id . '")');
                 $topic_id = DBConnection::getLastInsertID();
-                self::CreateNewPost($topic_content, $user_id, $topic_id);
+                self::_CreateNewPost($topic_content, $user_id, $topic_id);
                 return $topic_id;
             }
         }
     }
 
-    public static function CreateNewPost($topic_content, $user_id, $topic_id) {
-        return DBConnection::_executeQuery('INSERT INTO `posts`(`post_id`, `post_content`, `post_date`, `post_topic`, `post_by`) VALUES (DEFAULT,"' . $topic_content . '",DEFAULT,"' . $topic_id . '","' . $user_id . '")');
+    public static function CreateNewPost($post_content, $user_name, $topic_id) {
+        $post_content = nl2br($post_content);
+        $res = DBConnection::_executeSelectQuery("SELECT * FROM users where user_name = '$user_name' limit 1");
+        if ($res === false) {
+            return false;
+        } else {
+            while ($row = mysqli_fetch_array($res)) {
+                $user_id = $row['user_id'];
+                self::_CreateNewPost($post_content, $user_id, $topic_id);
+                return $topic_id;
+            }
+        }
+    }
+
+    public static function _CreateNewPost($post_content, $user_id, $topic_id) {
+        return DBConnection::_executeQuery('INSERT INTO `posts`(`post_id`, `post_content`, `post_date`, `post_topic`, `post_by`) VALUES (DEFAULT,"' . $post_content . '",DEFAULT,"' . $topic_id . '","' . $user_id . '")');
+    }
+    
+    public static function getCategoriesForAdminPanel() {
+        $res = DBConnection::_executeSelectQuery("SELECT * FROM categories");
+        if ($res === false) {
+            return false;
+        } else {
+            $response = Array();
+            while ($row = mysqli_fetch_array($res)) { //send back result
+                $response[$row['cat_id']] = $row['cat_name'];
+            }
+            return $response;
+        }
+    }
+    
+    public static function hiddenCategory($category_id, $category_action) {
+        if ($category_action == self::VISIBLE) {
+            $flag = TRUE;
+        } else if ($category_action == self::HIDDEN){
+            $flag = FALSE;
+        } else {
+            return FALSE;
+        }
+        return DBConnection::_executeQuery("UPDATE `categories` SET `cat_visible` = '$flag'  WHERE `cat_id` =  '$category_id'");
     }
 
 }
