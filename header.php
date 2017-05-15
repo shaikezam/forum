@@ -13,5 +13,7 @@
                 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
                 </head>
 
-    <body style='margin-left:15%;margin-right:15%;'>
-        <h1 align="center"><a href="index.php">My forum</a></h1>
+                <body style='margin-left:15%;margin-right:15%; background-color: #dbd4c0'>
+                    <div class='headerClass'>
+                        <h1 align="center"><a href="index.php">My forum</a></h1></div>
+                    <div class='bodyClass'>

@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         if (isset($_SESSION["user_level"])) {
             echo ' <a href="admin_panel.php">Admin panel </a>';
         }
-        echo '<a href="control_panel.php?id=' . $user_id . '">Control panel </a><a href="logout.php">log out</a><br><br>';
+        echo '<a href="control_panel.php?id=' . $user_id . '">Control panel </a><a href="logout.php">log out</a>';
         $data = Utils::getUserData($user_id);
         if (!$data) {
             Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);

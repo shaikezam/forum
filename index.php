@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         //return;
     } else {
         echo 'Hello ' . $_SESSION["logged"] . ',<br>';
-        $user_id = Utils::getUserByName($_SESSION["logged"]);
+        $user_id = Utils::getUserIDByName($_SESSION["logged"]);
         if (isset($_SESSION["user_level"])) {
             echo ' <a href="admin_panel.php">Admin panel </a>';
         }

@@ -82,9 +82,10 @@ class Utils {
             while ($row = mysqli_fetch_array($res)) { //send back result
                 $user_name = self::_getUserByID($row['topic_by']);
                 $num_of_posts = self::_getNumberOfPostsByTopic($row['topic_id']);
+                $topic_last_post_details = self::_getLastPostDetails($row['topic_id']);
                 $response = $response . '<tr><td><img src="assets/Speech_balloon.svg" alt="Smiley face" height="42" width="42"><a href="topic_display.php?id=' . $row['topic_id'] . '&forum_id=' . $cat_id . '"><strong> ' . $row['topic_subject'] . '</strong></a><br>Created by: ' . $user_name . '<br> ' . $row['topic_date'] . '</td>
                     <td>' . $num_of_posts . '</td>
-                    <td>' . 3333 . '</td>
+                    <td>' . $topic_last_post_details['post_date'] . '<br>' . $topic_last_post_details['user_name'] . '</td>
                   </tr>';
             }
             $response = $response . '</tbody></table>';
@@ -139,6 +140,20 @@ class Utils {
             return mysqli_num_rows($res);
         }
     }
+    
+    private static function _getLastPostDetails($topic_id) {
+        $res = DBConnection::_executeSelectQuery("SELECT * FROM posts WHERE post_topic = '" . $topic_id . "' ORDER BY post_id DESC LIMIT 1");
+        if ($res === false) {
+            return 0;
+        } else {
+            while ($row = mysqli_fetch_array($res)) { //send back result
+            $data = array();
+            $data['post_date'] = $row['post_date'];
+            $data['user_name'] = self::_getUserByID($row['post_by']);
+            return $data;
+            }
+        }
+    }
 
     private static function _getUserByID($user_id) {
         $res = DBConnection::_executeSelectQuery("SELECT * FROM users WHERE user_id = '" . $user_id . "'");
@@ -147,7 +162,7 @@ class Utils {
         }
     }
 
-    public static function getUserByName($user_name) {
+    public static function getUserIDByName($user_name) {
         $res = DBConnection::_executeSelectQuery("SELECT * FROM users WHERE user_name = '" . $user_name . "'");
         while ($row = mysqli_fetch_array($res)) { //send back result
             return $row['user_id'];
@@ -160,7 +175,7 @@ class Utils {
         if (!$data) {
             return false;
         }
-        return '<strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date']  . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
+        return '<h3>' . $data['user_name'] . '</h3><strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date']  . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
     }
 
     private static function _getNumberOfPostsByUserId($user_id) {
@@ -182,6 +197,7 @@ class Utils {
                 $data['user_email'] = $row['user_email'];
                 $data['user_date'] = $row['user_date'];
                 $data['user_level'] = $row['user_level'];
+                $data['user_name'] = $row['user_name'];
                 return $data;
             }
         }

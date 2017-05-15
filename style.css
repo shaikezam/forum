@@ -1,6 +1,38 @@
-.hhh {
-    width: 70%;
+.headerClass {
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+    border-radius: 20px;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    background-color: #f5f5f3;
+}
+.bodyClass {
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+    border-radius: 20px;
+    padding: 1%;
+    margin-bottom: 1%;
+    background-color: #f5f5f3;
+}
+table, th, td {
+    border-color: black !important;
 }
 textarea {
     resize: none;
+    border-style: solid !important;
+    border-color: #91938d !important;
+    border-width: 1px !important;
+}
+input {
+    resize: none;
+    border-style: solid !important;
+    border-color: #91938d !important;
+    border-width: 1px !important;
+}
+btn-default {
+    border-style: solid;
+    border-color: black !important;
+    border-width: 1px;
 }
