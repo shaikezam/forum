@@ -50,7 +50,6 @@ class Utils {
     public static function createNewCategory($category_name, $category_description) {
         //return DBConnection::_executeQuery('INSERT INTO categories VALUES (DEFAULT,"' . $category_name . '", "' . $category_description . ', DEFAULT")');
         return DBConnection::_executeQuery('INSERT INTO `categories`(`cat_id`, `cat_name`, `cat_description`, `cat_visible`) VALUES (DEFAULT,"' . $category_name . '","' . $category_description . '", DEFAULT)');
-
     }
 
     public static function getCategories() {
@@ -148,12 +147,43 @@ class Utils {
         }
     }
 
+    public static function getUserByName($user_name) {
+        $res = DBConnection::_executeSelectQuery("SELECT * FROM users WHERE user_name = '" . $user_name . "'");
+        while ($row = mysqli_fetch_array($res)) { //send back result
+            return $row['user_id'];
+        }
+    }
+
+    public static function getUserData($user_id) {
+        $num_of_posts = self::_getNumberOfPostsByUserId($user_id);
+        $data = self::_getUserData($user_id);
+        if (!$data) {
+            return false;
+        }
+        return '<strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date']  . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
+    }
+
     private static function _getNumberOfPostsByUserId($user_id) {
         $res = DBConnection::_executeSelectQuery("SELECT * FROM posts WHERE post_by = '" . $user_id . "'");
         if ($res === false) {
             return 0;
         } else {
             return mysqli_num_rows($res);
+        }
+    }
+
+    private static function _getUserData($user_id) {
+        $data=array();
+        $res = DBConnection::_executeSelectQuery("SELECT * FROM users WHERE user_id = '" . $user_id . "'");
+        if ($res === false) {
+            return 0;
+        } else {
+            while ($row = mysqli_fetch_array($res)) { //send back result
+                $data['user_email'] = $row['user_email'];
+                $data['user_date'] = $row['user_date'];
+                $data['user_level'] = $row['user_level'];
+                return $data;
+            }
         }
     }
 
@@ -198,7 +228,7 @@ class Utils {
     public static function _CreateNewPost($post_content, $user_id, $topic_id) {
         return DBConnection::_executeQuery('INSERT INTO `posts`(`post_id`, `post_content`, `post_date`, `post_topic`, `post_by`) VALUES (DEFAULT,"' . $post_content . '",DEFAULT,"' . $topic_id . '","' . $user_id . '")');
     }
-    
+
     public static function getCategoriesForAdminPanel() {
         $res = DBConnection::_executeSelectQuery("SELECT * FROM categories");
         if ($res === false) {
@@ -211,11 +241,11 @@ class Utils {
             return $response;
         }
     }
-    
+
     public static function hiddenCategory($category_id, $category_action) {
         if ($category_action == self::VISIBLE) {
             $flag = TRUE;
-        } else if ($category_action == self::HIDDEN){
+        } else if ($category_action == self::HIDDEN) {
             $flag = FALSE;
         } else {
             return FALSE;

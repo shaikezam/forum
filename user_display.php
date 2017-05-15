@@ -17,17 +17,17 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         //return;
     } else {
         echo 'Hello ' . $_SESSION["logged"] . ',<br>';
-        $user_id = Utils::getUserByName($_SESSION["logged"]);
+        $user_id = $_GET['id'];
         if (isset($_SESSION["user_level"])) {
             echo ' <a href="admin_panel.php">Admin panel </a>';
         }
-        echo '<a href="control_panel.php">Control panel </a><a href="logout.php">log out</a><br><br>';
-    }
-    $categories = Utils::getCategories();
-    if (!$categories) {
-        Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);
-    } else {
-        echo $categories;
+        echo '<a href="control_panel.php?id=' . $user_id . '">Control panel </a><a href="logout.php">log out</a><br><br>';
+        $data = Utils::getUserData($user_id);
+        if (!$data) {
+            Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);
+        } else {
+            echo $data;
+        }
     }
 } else {
     

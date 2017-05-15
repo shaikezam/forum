@@ -14,4 +14,4 @@
                 </head>
 
     <body style='margin-left:15%;margin-right:15%;'>
-                    <h1 align="center">My forum</h1>
+        <h1 align="center"><a href="index.php">My forum</a></h1>
