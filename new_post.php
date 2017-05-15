@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         echo '<a href="control_panel.php">Control panel </a><a href="logout.php">log out</a>' .
         '<h3>New Post</h3>' .
         '<form method="post" action="" align = "center">' .
-        '<button type=button><b>Bold</b></button> <button type=button><i>Italic</i></button>  <button type=button><u>Under-line</u></button><br><br>' .
+        '<button class="btn btn-default" type=button><b>Bold</b></button> <button class="btn btn-default" type=button><i>Italic</i></button>  <button class="btn btn-default" type=button><u>Under-line</u></button><br><br>' .
         '<textarea class="form-control" rows="8"  name="post_content" id="comment" placeholder="Enter post content"></textarea><br>' .
         '<input type="submit" value="Create new post" id="submitLogin" class="btn btn-default" />
             </form><br>';
