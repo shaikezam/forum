@@ -5,7 +5,7 @@ class DBConnection {
     protected static $server = 'localhost';
     protected static $user = 'root';
     protected static $password = '';
-    protected static $db = 'myforum12';
+    protected static $db = 'myforum';
     protected static $connectionString;
 
     /* setters & getters */
@@ -89,8 +89,9 @@ class DBConnection {
             self::getDBConnection();
         }
         $result = mysqli_query(self::$connectionString, $sql);
-        if (!$result) // error in query
+        if (!$result) { // error in query
             echo 'Invalid query: ' . mysqli_error(); //sending error message
+        }
         $numResults = mysqli_num_rows($result);
         if ($numResults == 0) {
             return false;

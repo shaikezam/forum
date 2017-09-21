@@ -1,11 +1,11 @@
 <?php
 
-//signup.php
-include 'dbmanager.php';
-include 'header.php';
-include 'footer.php';
-include 'utils.php';
 session_start();
+include_once 'dbmanager.php';
+include_once 'header.php';
+include_once 'footer.php';
+include_once 'utils.php';
+
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     if (isset($_SESSION["logged"]) && isset($_SESSION["user_level"])) {

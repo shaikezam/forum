@@ -1,11 +1,11 @@
 <?php
 
-//signup.php
-include_once 'dbmanager.php';
-include 'header.php';
-include 'footer.php';
-include 'utils.php';
 session_start();
+include_once 'dbmanager.php';
+include_once 'header.php';
+include_once 'footer.php';
+include_once 'utils.php';
+
 //session_destroy();
 
 

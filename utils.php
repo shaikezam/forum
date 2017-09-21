@@ -140,17 +140,17 @@ class Utils {
             return mysqli_num_rows($res);
         }
     }
-    
+
     private static function _getLastPostDetails($topic_id) {
         $res = DBConnection::_executeSelectQuery("SELECT * FROM posts WHERE post_topic = '" . $topic_id . "' ORDER BY post_id DESC LIMIT 1");
         if ($res === false) {
             return 0;
         } else {
             while ($row = mysqli_fetch_array($res)) { //send back result
-            $data = array();
-            $data['post_date'] = $row['post_date'];
-            $data['user_name'] = self::_getUserByID($row['post_by']);
-            return $data;
+                $data = array();
+                $data['post_date'] = $row['post_date'];
+                $data['user_name'] = self::_getUserByID($row['post_by']);
+                return $data;
             }
         }
     }
@@ -175,7 +175,7 @@ class Utils {
         if (!$data) {
             return false;
         }
-        return '<h3>' . $data['user_name'] . '</h3><strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date']  . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
+        return '<h3>' . $data['user_name'] . '</h3><strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date'] . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
     }
 
     private static function _getNumberOfPostsByUserId($user_id) {
@@ -188,7 +188,7 @@ class Utils {
     }
 
     private static function _getUserData($user_id) {
-        $data=array();
+        $data = array();
         $res = DBConnection::_executeSelectQuery("SELECT * FROM users WHERE user_id = '" . $user_id . "'");
         if ($res === false) {
             return 0;
