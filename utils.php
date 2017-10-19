@@ -11,6 +11,7 @@ class Utils {
     const DEFAULT_ERROR_MSG = 'An error occurred, please try again';
     const NOT_AUTHORIZED = 'Not authorized operation';
     const USER_EXISTS = 'There is user with those details';
+    const DUPLICATE_POST = 'Please prevent from posting duplicate posts';
     const CHOOSE_CATEGORY = 'Choose Category';
     const VISIBLE = 'Visible';
     const HIDDEN = 'Hidden';
@@ -23,9 +24,9 @@ class Utils {
         echo '<div class="alert alert-danger">' . $str . '</div>';
     }
 
-    public static function ValidateRegisterDetails($username, $user_pass, $user_pass_check, $user_email) {
+    public static function ValidateRegisterDetails($username, $user_pass, $user_pass_check, $user_email, $user_location) {
         if (strlen($username) > self::USER_NAME_MIN_LENGTH && $user_pass === $user_pass_check && filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
-            return DBConnection::_executeQuery('INSERT INTO users VALUES (DEFAULT,"' . $username . '", "' . $user_pass . '", "' . $user_email . '", DEFAULT, "Regular")');
+            return DBConnection::_executeQuery('INSERT INTO users VALUES (DEFAULT,"' . $username . '", "' . $user_pass . '", "' . $user_email . '", DEFAULT, "Regular", DEFAULT, DEFAULT,"' . $user_location . '")');
         } else {
             return false;
         }
@@ -100,13 +101,16 @@ class Utils {
         if ($res === false) {
             return false;
         } else {
-            $response = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:15%;">User</th><th>Post content</th></tr></thead><tbody>';
+            $response = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:20%;">User</th><th>Post content</th></tr></thead><tbody>';
             while ($row = mysqli_fetch_array($res)) { //send back result
-                $user_name = self::_getUserByID($row['post_by']);
+                $data = self::_getUserData($row['post_by']);
                 $num_of_posts = self::_getNumberOfPostsByUserId($row['post_by']);
-                $response = $response . '<tr><td><a href="user_display.php?id=' . $row['post_by'] . '"><strong> ' . $user_name . '</strong></a><br># of posts: ' . $num_of_posts . '<br>' . $row['post_date'] . '</td>
-                    <td>' . $row['post_content'] . '</td>
-                  </tr>';
+                $user_name = $data['user_name'];
+                $user_signature = $data['user_signature'];
+                $user_location = $data['user_location'];
+                $user_avatar = $data['user_avatar'];
+                $response = $response . '<tr><td><a href="user_display.php?id=' . $row['post_by'] . '"><strong> ' . $user_name . '</strong></a><br><img style="max-width:100px;max-height:100px" src = ' . $user_avatar . '><br>Location: ' . $user_location . '</a><br># of posts: ' . $num_of_posts . '<br>Posted in: ' . $row['post_date'] . '</td>
+                    <td>' . $row['post_content'] . '<br><hr class="post-hr"><img src=' . $user_signature . '></td></tr>';
             }
             $response = $response . '</tbody></table>';
 
@@ -162,6 +166,20 @@ class Utils {
         }
     }
 
+    private static function _getUserSignatureByID($user_id) {
+        $res = DBConnection::_executeSelectQuery("SELECT user_signature FROM users WHERE user_id = '" . $user_id . "'");
+        while ($row = mysqli_fetch_array($res)) { //send back result
+            return $row['user_signature'];
+        }
+    }
+    
+    private static function _getUserAvatarByID($user_id) {
+        $res = DBConnection::_executeSelectQuery("SELECT user_avatar FROM users WHERE user_id = '" . $user_id . "'");
+        while ($row = mysqli_fetch_array($res)) { //send back result
+            return $row['user_avatar'];
+        }
+    }
+
     public static function getUserIDByName($user_name) {
         $res = DBConnection::_executeSelectQuery("SELECT * FROM users WHERE user_name = '" . $user_name . "'");
         while ($row = mysqli_fetch_array($res)) { //send back result
@@ -169,13 +187,16 @@ class Utils {
         }
     }
 
-    public static function getUserData($user_id) {
+    public static function getUserData($user_id, $bFormatted = false) {
         $num_of_posts = self::_getNumberOfPostsByUserId($user_id);
         $data = self::_getUserData($user_id);
         if (!$data) {
             return false;
         }
-        return '<h3>' . $data['user_name'] . '</h3><strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date'] . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
+        if ($bFormatted) {
+            return $data;
+        }
+        return '<h3>' . $data['user_name'] . '</h3><img style="max-width:100px;max-height:100px" src = ' . $data['user_avatar'] . '><br><strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date'] . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
     }
 
     private static function _getNumberOfPostsByUserId($user_id) {
@@ -198,6 +219,9 @@ class Utils {
                 $data['user_date'] = $row['user_date'];
                 $data['user_level'] = $row['user_level'];
                 $data['user_name'] = $row['user_name'];
+                $data['user_location'] = $row['user_location'];
+                $data['user_signature'] = $row['user_signature'];
+                $data['user_avatar'] = $row['user_avatar'];
                 return $data;
             }
         }
@@ -207,8 +231,23 @@ class Utils {
         return true;
     }
 
+    /* Checking last message is not posted by the same user (prevent spam and double posts - except Admins) */
+
     public static function ValidateNewPost($post_content, $user_name, $topic_id) {
-        return true;
+        $return_obj = array("status" => false, "message" => self::DUPLICATE_POST);
+        $res = DBConnection::_executeSelectQuery("SELECT * FROM posts where post_topic = '" . $topic_id . "' ORDER BY post_id DESC LIMIT 1");
+        if ($res === false) {
+            $return_obj["message"] = self::DEFAULT_ERROR_MSG;
+        } else {
+            $current_user_id = self::getUserIDByName($user_name);
+            $row = mysqli_fetch_array($res);
+            $last_post_user_id = $row['post_by'];
+            if ($current_user_id == $last_post_user_id) {
+                return $return_obj;
+            }
+            $return_obj["status"] = true;
+        }
+        return $return_obj;
     }
 
     public static function CreateNewTopic($topic_subject, $topic_content, $user_name, $cat_id) {

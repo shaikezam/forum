@@ -1,5 +1,5 @@
 <?php
-
+ob_start();
 session_start();
 include_once 'dbmanager.php';
 include_once 'header.php';
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         echo '<a href="control_panel.php">Control panel </a><a href="logout.php">log out</a>' .
         '<h3>New Post</h3>' .
         '<form method="post" action="" align = "center">' .
-        '<button class="btn btn-default" type=button><b>Bold</b></button> <button class="btn btn-default" type=button><i>Italic</i></button>  <button class="btn btn-default" type=button><u>Under-line</u></button><br><br>' .
+        /*'<button class="btn btn-default" type=button><b>Bold</b></button> <button class="btn btn-default" type=button><i>Italic</i></button>  <button class="btn btn-default" type=button><u>Under-line</u></button><br><br>' .*/
         '<textarea class="form-control" rows="8"  name="post_content" id="comment" placeholder="Enter post content"></textarea><br>' .
         '<input type="submit" value="Create new post" id="submitLogin" class="btn btn-default" />
             </form><br>';
@@ -35,13 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     $cat_id = $_GET['forum_id'];
     $user_name = ($_SESSION["logged"]);
     $post_content = $_POST['post_content'];
-    $is_valid = Utils::ValidateNewPost($post_content, $user_name, $topic_id);
-    if ($is_valid) {
+    $is_valid_obj = Utils::ValidateNewPost($post_content, $user_name, $topic_id);
+    if ($is_valid_obj["status"]) {
         $topic_id = Utils::CreateNewPost($post_content, $user_name, $topic_id);
         header('Location: topic_display.php?id=' . $topic_id . '&forum_id=' . $cat_id);
         
     } else {
-        Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);
+        Utils::ThrowErrorLog($is_valid_obj["message"]);
     }
 }
 ?>

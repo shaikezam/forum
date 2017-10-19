@@ -1,5 +1,5 @@
 <?php
-
+ob_start();
 session_start();
 include_once 'dbmanager.php';
 include_once 'header.php';
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         '<h3>New Topic</h3>' .
         '<form method="post" action="" align = "center">' .
         '<input type="text" name="topic_subject" class="form-control" placeholder="Enter topic subject"/><br>' .
-        '<button class="btn btn-default" type=button><b>Bold</b></button> <button class="btn btn-default" type=button><i>Italic</i></button>  <button class="btn btn-default" type=button><u>Under-line</u></button><br><br>' .
+        /*'<button class="btn btn-default" type=button><b>Bold</b></button> <button class="btn btn-default" type=button><i>Italic</i></button>  <button class="btn btn-default" type=button><u>Under-line</u></button><br><br>' .*/
         '<textarea class="form-control" rows="8"  name="topic_content" id="comment" placeholder="Enter topic content"></textarea><br>' .
         '<input type="submit" value="Create new topic" id="submitLogin" class="btn btn-default" />
             </form><br>';

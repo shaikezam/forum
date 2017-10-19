@@ -36,3 +36,11 @@ btn-default {
     border-color: black !important;
     border-width: 1px;
 }
+.post-hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #B6B6B4;
+    margin: 1em 0;
+    padding: 0; 
+}
