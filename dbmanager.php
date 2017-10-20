@@ -118,7 +118,7 @@ class DBConnection {
     user_date   DATETIME NOT NULL DEFAULT NOW(),
     user_level  VARCHAR(255) NOT NULL,
     user_signature TEXT DEFAULT "",
-    user_avatar TEXT DEFAULT "",
+    user_avatar BLOB,
     user_location VARCHAR(255) DEFAULT "",
     UNIQUE INDEX user_name_unique (user_name),
     UNIQUE INDEX user_email_unique (user_email),
@@ -152,8 +152,8 @@ class DBConnection {
     PRIMARY KEY (post_id)
 ) Engine=InnoDB');
         /*Create admin user and regular user for testing*/
-        self::_executeQuery('INSERT INTO users VALUES (DEFAULT, "Admin", "Admin1234", "shaike.zam@gmail.com", DEFAULT, "Admin", "http://img.photobucket.com/albums/v455/shy360/202.gif", "http://img.photobucket.com/albums/v455/shy360/diwowomo.jpg", "IL")');
-        self::_executeQuery('INSERT INTO users VALUES (DEFAULT, "Shaike", "Shaike1234", "babababa360@gmail.com", DEFAULT, "Regular", "http://img.photobucket.com/albums/v455/shy360/Untitled-6copy.jpg", "http://img.photobucket.com/albums/v455/shy360/Cleric.jpg", "Tel-Aviv")');
+        self::_executeQuery('INSERT INTO users VALUES (DEFAULT, "Admin", "Admin1234", "shaike.zam@gmail.com", DEFAULT, "Admin", "http://img.photobucket.com/albums/v455/shy360/202.gif", null, "IL")');
+        self::_executeQuery('INSERT INTO users VALUES (DEFAULT, "Shaike", "Shaike1234", "babababa360@gmail.com", DEFAULT, "Regular", "http://img.photobucket.com/albums/v455/shy360/Untitled-6copy.jpg", null, "Tel-Aviv")');
         
         self::_executeQuery('ALTER TABLE ' . self::getDB() . ' topics ADD FOREIGN KEY(topic_cat) REFERENCES  ' . self::getDB() . ' categories(cat_id) ON DELETE CASCADE ON UPDATE CASCADE;');
         self::_executeQuery('ALTER TABLE ' . self::getDB() . ' topics ADD FOREIGN KEY(topic_by) REFERENCES  ' . self::getDB() . ' users(user_id) ON DELETE RESTRICT ON UPDATE CASCADE;');

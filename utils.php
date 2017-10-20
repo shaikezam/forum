@@ -6,12 +6,19 @@ class Utils {
 
     const USER_NAME_MIN_LENGTH = 4;
     const USER_NOT_FOUND = 'Wrong log in details';
+    /*useres levels*/
     const ADMIN = 'Admin';
     const REGULAR = 'Regular';
+    
+    /*messages*/
     const DEFAULT_ERROR_MSG = 'An error occurred, please try again';
     const NOT_AUTHORIZED = 'Not authorized operation';
     const USER_EXISTS = 'There is user with those details';
     const DUPLICATE_POST = 'Please prevent from posting duplicate posts';
+    const TOPICS_NOT_FOUND = "There isn't topics in this category";
+    const CATEGORIES_NOT_FOUND = "There isn't categories";
+    const INVALID_FORMAT = "Not supported format";
+    
     const CHOOSE_CATEGORY = 'Choose Category';
     const VISIBLE = 'Visible';
     const HIDDEN = 'Hidden';
@@ -56,7 +63,10 @@ class Utils {
     public static function getCategories() {
         $res = DBConnection::_executeSelectQuery("SELECT * FROM categories WHERE cat_visible = 1");
         if ($res === false) {
-            return false;
+            $res = array();
+            $res['status'] = 'Error';
+            $res['message'] = self::CATEGORIES_NOT_FOUND;
+            return $res;
         } else {
             $response = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:70%;">Categories</th><th># of topics</th><th># of posts</th></tr></thead><tbody>';
             while ($row = mysqli_fetch_array($res)) { //send back result
@@ -77,7 +87,10 @@ class Utils {
 
         $res = DBConnection::_executeSelectQuery("SELECT * FROM topics WHERE topic_cat = '" . $cat_id . "'");
         if ($res === false) {
-            return false;
+            $res = array();
+            $res['status'] = 'Error';
+            $res['message'] = self::TOPICS_NOT_FOUND;
+            return $res;
         } else {
             $response = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:70%;">Topic</th><th># of posts</th><th>Last post</th></tr></thead><tbody>';
             while ($row = mysqli_fetch_array($res)) { //send back result
@@ -109,8 +122,9 @@ class Utils {
                 $user_signature = $data['user_signature'];
                 $user_location = $data['user_location'];
                 $user_avatar = $data['user_avatar'];
-                $response = $response . '<tr><td><a href="user_display.php?id=' . $row['post_by'] . '"><strong> ' . $user_name . '</strong></a><br><img style="max-width:100px;max-height:100px" src = ' . $user_avatar . '><br>Location: ' . $user_location . '</a><br># of posts: ' . $num_of_posts . '<br>Posted in: ' . $row['post_date'] . '</td>
-                    <td>' . $row['post_content'] . '<br><hr class="post-hr"><img src=' . $user_signature . '></td></tr>';
+                $response = $response . '<tr><td><a href="user_display.php?id=' . $row['post_by'] . '"><strong> ' . $user_name . '</strong></a><br><img style="max-width:100px;max-height:100px" src = "data:image/png;base64,'.base64_encode($user_avatar).'"/><br>Location: ' . $user_location . '</a><br># of posts: ' . $num_of_posts . '<br>Posted in: ' . $row['post_date'] . '</td>
+                    <td>' . $row['post_content'];
+                //$response = $response . '<br><hr class="post-hr">' . $user_signature . '</td></tr>';
             }
             $response = $response . '</tbody></table>';
 
@@ -196,7 +210,12 @@ class Utils {
         if ($bFormatted) {
             return $data;
         }
-        return '<h3>' . $data['user_name'] . '</h3><img style="max-width:100px;max-height:100px" src = ' . $data['user_avatar'] . '><br><strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date'] . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
+        return '<h3>' . $data['user_name'] . '</h3><img style="max-width:100px;max-height:100px" src = "data:image/png;base64,'.base64_encode($data['user_avatar']).'"/><br><strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date'] . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
+    }
+    
+    public static function setImageToUser($user_name, $image) {
+        $user_id = self::getUserIDByName($user_name);
+        return DBConnection::_executeQuery("UPDATE `users` SET `user_avatar` = '{$image}'  WHERE `user_id` =  '$user_id'");
     }
 
     private static function _getNumberOfPostsByUserId($user_id) {

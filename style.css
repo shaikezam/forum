@@ -44,3 +44,6 @@ btn-default {
     margin: 1em 0;
     padding: 0; 
 }
+.control-panel-section {
+    margin-left: 2%;
+}

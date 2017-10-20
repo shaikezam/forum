@@ -24,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         echo '<a href="control_panel.php">Control panel </a><a href="logout.php">log out</a><br><br>';
     }
     $categories = Utils::getCategories();
-    if (!$categories) {
-        Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);
+    if (is_array($categories) && $categories['status'] === 'Error') {
+        Utils::ThrowErrorLog($categories['message']);
     } else {
         echo $categories;
     }

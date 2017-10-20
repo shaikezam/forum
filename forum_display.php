@@ -28,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             </form><br>';
     }
     $topics = Utils::getTopics($cat_id);
-    if (!$topics) {
-        Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);
+    if (is_array($topics) && $topics['status'] === 'Error') {
+        Utils::ThrowErrorLog($topics['message']);
     } else {
         echo $topics;
     }
