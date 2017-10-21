@@ -37,12 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     $topic_subject = $_POST['topic_subject'];
     $topic_content = $_POST['topic_content'];
     $is_valid = Utils::ValidateNewTopic($topic_subject, $topic_content, $user_name, $cat_id);
-    if ($is_valid) {
+    if ($is_valid["status"] == true) {
         $topic_id = Utils::CreateNewTopic($topic_subject, $topic_content, $user_name, $cat_id);
         header('Location: topic_display.php?id=' . $topic_id . '&forum_id=' . $cat_id);
-        
     } else {
-        Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);
+        Utils::ThrowErrorLog($is_valid["message"]);
     }
 }
 ?>

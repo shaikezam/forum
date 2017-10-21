@@ -6,11 +6,11 @@ class Utils {
 
     const USER_NAME_MIN_LENGTH = 4;
     const USER_NOT_FOUND = 'Wrong log in details';
-    /*useres levels*/
+    /* useres levels */
     const ADMIN = 'Admin';
     const REGULAR = 'Regular';
-    
-    /*messages*/
+
+    /* messages */
     const DEFAULT_ERROR_MSG = 'An error occurred, please try again';
     const NOT_AUTHORIZED = 'Not authorized operation';
     const USER_EXISTS = 'There is user with those details';
@@ -18,6 +18,10 @@ class Utils {
     const TOPICS_NOT_FOUND = "There isn't topics in this category";
     const CATEGORIES_NOT_FOUND = "There isn't categories";
     const INVALID_FORMAT = "Not supported format";
+    const INVALID_SIZE = "Image weighs more than 65 KB";
+    const NOT_IMAGE = "File is not an image";
+    const TOPIC_EMPTY = "New topic must have subject and content";
+    const POST_EMPTY = "New post must have content";
     
     const CHOOSE_CATEGORY = 'Choose Category';
     const VISIBLE = 'Visible';
@@ -122,7 +126,7 @@ class Utils {
                 $user_signature = $data['user_signature'];
                 $user_location = $data['user_location'];
                 $user_avatar = $data['user_avatar'];
-                $response = $response . '<tr><td><a href="user_display.php?id=' . $row['post_by'] . '"><strong> ' . $user_name . '</strong></a><br><img style="max-width:100px;max-height:100px" src = "data:image/png;base64,'.base64_encode($user_avatar).'"/><br>Location: ' . $user_location . '</a><br># of posts: ' . $num_of_posts . '<br>Posted in: ' . $row['post_date'] . '</td>
+                $response = $response . '<tr><td><a href="user_display.php?id=' . $row['post_by'] . '"><strong> ' . $user_name . '</strong></a><br><img style="max-width:100px;max-height:100px" src = "data:image/png;base64,' . base64_encode($user_avatar) . '"/><br>Location: ' . $user_location . '</a><br># of posts: ' . $num_of_posts . '<br>Posted in: ' . $row['post_date'] . '</td>
                     <td>' . $row['post_content'];
                 //$response = $response . '<br><hr class="post-hr">' . $user_signature . '</td></tr>';
             }
@@ -186,7 +190,7 @@ class Utils {
             return $row['user_signature'];
         }
     }
-    
+
     private static function _getUserAvatarByID($user_id) {
         $res = DBConnection::_executeSelectQuery("SELECT user_avatar FROM users WHERE user_id = '" . $user_id . "'");
         while ($row = mysqli_fetch_array($res)) { //send back result
@@ -210,9 +214,9 @@ class Utils {
         if ($bFormatted) {
             return $data;
         }
-        return '<h3>' . $data['user_name'] . '</h3><img style="max-width:100px;max-height:100px" src = "data:image/png;base64,'.base64_encode($data['user_avatar']).'"/><br><strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date'] . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
+        return '<h3>' . $data['user_name'] . '</h3><img style="max-width:100px;max-height:100px" src = "data:image/png;base64,' . base64_encode($data['user_avatar']) . '"/><br><strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date'] . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
     }
-    
+
     public static function setImageToUser($user_name, $image) {
         $user_id = self::getUserIDByName($user_name);
         return DBConnection::_executeQuery("UPDATE `users` SET `user_avatar` = '{$image}'  WHERE `user_id` =  '$user_id'");
@@ -247,7 +251,11 @@ class Utils {
     }
 
     public static function ValidateNewTopic($topic_subject, $topic_content, $user_name, $cat_id) {
-        return true;
+        $return_obj = array("status" => false, "message" => self::TOPIC_EMPTY);
+        if ($topic_subject != "" && $topic_content != "") {
+            $return_obj["status"] = true;
+        }
+        return $return_obj;
     }
 
     /* Checking last message is not posted by the same user (prevent spam and double posts - except Admins) */
@@ -257,6 +265,8 @@ class Utils {
         $res = DBConnection::_executeSelectQuery("SELECT * FROM posts where post_topic = '" . $topic_id . "' ORDER BY post_id DESC LIMIT 1");
         if ($res === false) {
             $return_obj["message"] = self::DEFAULT_ERROR_MSG;
+        } else if ($post_content == "") {
+            $return_obj["message"] = self::POST_EMPTY;
         } else {
             $current_user_id = self::getUserIDByName($user_name);
             $row = mysqli_fetch_array($res);

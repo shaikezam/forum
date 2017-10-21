@@ -99,8 +99,13 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
         if ($check !== false) {
             $uploadOk = 1;
-            if ($imageFileType != "jpg" || $imageFileType != "png" || $imageFileType != "jpeg" || $imageFileType != "gif") {
+            if (!($imageFileType === "jpg" || $imageFileType === "png" || $imageFileType === "jpeg" || $imageFileType === "gif")) {
                 Utils::ThrowErrorLog(Utils::INVALID_FORMAT);
+                return;
+            }
+            $file_size_in_bytes = $_FILES['fileToUpload']['size'];
+            if ($file_size_in_bytes > 65000) {
+                Utils::ThrowErrorLog(Utils::INVALID_SIZE);
                 return;
             }
             /* if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
@@ -116,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
                 header('Location: index.php');
             }
         } else {
-            echo "File is not an image.";
+            Utils::ThrowErrorLog(Utils::NOT_IMAGE);
             $uploadOk = 0;
         }
     }
