@@ -1,13 +1,10 @@
 <?php
-
+ob_start();
 session_start();
 include_once 'dbmanager.php';
 include_once 'header.php';
 include_once 'footer.php';
 include_once 'utils.php';
-
-//session_destroy();
-
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     /* the form hasn't been posted yet, display it
@@ -20,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
                 Password: <input type="password" name="user_pass" class="form-control" ><br>
                 Password again: <input type="password" name="user_pass_check" class="form-control" ><br>
                 E-mail: <input type="email" name="user_email" class="form-control" ><br>
+                Location: <input type="text" name="user_location" class="form-control" ><br>
                 <input type="submit" value="register" id="submitRegister" class="btn btn-default" />
             </form>';
         return;
@@ -32,7 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         $user_pass = $_POST['user_pass'];
         $user_pass_check = $_POST['user_pass_check'];
         $user_email = $_POST['user_email'];
-        $res = Utils::ValidateRegisterDetails($username, $user_pass, $user_pass_check, $user_email);
+        $user_location = $_POST['user_location'];
+        $res = Utils::ValidateRegisterDetails($username, $user_pass, $user_pass_check, $user_email, $user_location);
         if ($res == '1') {
             $_SESSION["logged"] = $username;
             header('Location: index.php');

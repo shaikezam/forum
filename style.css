@@ -36,3 +36,21 @@ btn-default {
     border-color: black !important;
     border-width: 1px;
 }
+.post-hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #B6B6B4;
+    margin: 1em 0;
+    padding: 0; 
+}
+.control-panel-section {
+    margin-left: 2%;
+}
+.alert-danger {
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+.forum-display {
+    margin-top: 1%;
+}

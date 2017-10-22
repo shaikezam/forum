@@ -1,5 +1,5 @@
 <?php
-
+ob_start();
 session_start();
 include_once 'dbmanager.php';
 include_once 'header.php';

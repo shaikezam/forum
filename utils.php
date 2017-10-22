@@ -6,11 +6,23 @@ class Utils {
 
     const USER_NAME_MIN_LENGTH = 4;
     const USER_NOT_FOUND = 'Wrong log in details';
+    /* useres levels */
     const ADMIN = 'Admin';
     const REGULAR = 'Regular';
+
+    /* messages */
     const DEFAULT_ERROR_MSG = 'An error occurred, please try again';
     const NOT_AUTHORIZED = 'Not authorized operation';
     const USER_EXISTS = 'There is user with those details';
+    const DUPLICATE_POST = 'Please prevent from posting duplicate posts';
+    const TOPICS_NOT_FOUND = "There isn't topics in this category";
+    const CATEGORIES_NOT_FOUND = "There isn't categories";
+    const INVALID_FORMAT = "Not supported format";
+    const INVALID_SIZE = "Image weighs more than 65 KB";
+    const NOT_IMAGE = "File is not an image";
+    const TOPIC_EMPTY = "New topic must have subject and content";
+    const POST_EMPTY = "New post must have content";
+    
     const CHOOSE_CATEGORY = 'Choose Category';
     const VISIBLE = 'Visible';
     const HIDDEN = 'Hidden';
@@ -23,9 +35,9 @@ class Utils {
         echo '<div class="alert alert-danger">' . $str . '</div>';
     }
 
-    public static function ValidateRegisterDetails($username, $user_pass, $user_pass_check, $user_email) {
+    public static function ValidateRegisterDetails($username, $user_pass, $user_pass_check, $user_email, $user_location) {
         if (strlen($username) > self::USER_NAME_MIN_LENGTH && $user_pass === $user_pass_check && filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
-            return DBConnection::_executeQuery('INSERT INTO users VALUES (DEFAULT,"' . $username . '", "' . $user_pass . '", "' . $user_email . '", DEFAULT, "Regular")');
+            return DBConnection::_executeQuery('INSERT INTO users VALUES (DEFAULT,"' . $username . '", "' . $user_pass . '", "' . $user_email . '", DEFAULT, "Regular", DEFAULT, DEFAULT,"' . $user_location . '")');
         } else {
             return false;
         }
@@ -55,7 +67,10 @@ class Utils {
     public static function getCategories() {
         $res = DBConnection::_executeSelectQuery("SELECT * FROM categories WHERE cat_visible = 1");
         if ($res === false) {
-            return false;
+            $res = array();
+            $res['status'] = 'Error';
+            $res['message'] = self::CATEGORIES_NOT_FOUND;
+            return $res;
         } else {
             $response = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:70%;">Categories</th><th># of topics</th><th># of posts</th></tr></thead><tbody>';
             while ($row = mysqli_fetch_array($res)) { //send back result
@@ -74,11 +89,14 @@ class Utils {
 
     public static function getTopics($cat_id) {
 
-        $res = DBConnection::_executeSelectQuery("SELECT * FROM topics WHERE topic_cat = '" . $cat_id . "'");
+        $res = DBConnection::_executeSelectQuery("SELECT * FROM topics WHERE topic_cat = '" . $cat_id . "' order by topic_date DESC");
         if ($res === false) {
-            return false;
+            $res = array();
+            $res['status'] = 'Error';
+            $res['message'] = self::TOPICS_NOT_FOUND;
+            return $res;
         } else {
-            $response = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:70%;">Topic</th><th># of posts</th><th>Last post</th></tr></thead><tbody>';
+            $response = '<table class="table table-bordered forum-display"><thead><tr style="background-color:#a7acaf;"><th style = "width:70%;">Topic</th><th># of posts</th><th>Last post</th></tr></thead><tbody>';
             while ($row = mysqli_fetch_array($res)) { //send back result
                 $user_name = self::_getUserByID($row['topic_by']);
                 $num_of_posts = self::_getNumberOfPostsByTopic($row['topic_id']);
@@ -96,17 +114,27 @@ class Utils {
 
     public static function getPosts($cat_id, $topic_id) {
 
-        $res = DBConnection::_executeSelectQuery("SELECT * FROM posts WHERE post_topic = '" . $topic_id . "'");
+        $res = DBConnection::_executeSelectQuery("SELECT DISTINCT topics.topic_subject, posts.post_by, posts.post_date, posts.post_content FROM posts, topics WHERE post_topic = '" . $topic_id . "' and topics.topic_cat = '" . $cat_id . "' and topics.topic_id = '" . $topic_id . "'");
         if ($res === false) {
             return false;
         } else {
-            $response = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:15%;">User</th><th>Post content</th></tr></thead><tbody>';
+            $b_print_subject_once = true;
+            $tmpString = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:20%;">User</th><th>Post content</th></tr></thead><tbody>';
+            $response = "<h3>";
             while ($row = mysqli_fetch_array($res)) { //send back result
-                $user_name = self::_getUserByID($row['post_by']);
+                if ($b_print_subject_once) {
+                    $b_print_subject_once = false;
+                    $response = $response . $row['topic_subject'] . '</h3>' . $tmpString;
+                }
+                $data = self::_getUserData($row['post_by']);
                 $num_of_posts = self::_getNumberOfPostsByUserId($row['post_by']);
-                $response = $response . '<tr><td><a href="user_display.php?id=' . $row['post_by'] . '"><strong> ' . $user_name . '</strong></a><br># of posts: ' . $num_of_posts . '<br>' . $row['post_date'] . '</td>
-                    <td>' . $row['post_content'] . '</td>
-                  </tr>';
+                $user_name = $data['user_name'];
+                $user_signature = $data['user_signature'];
+                $user_location = $data['user_location'];
+                $user_avatar = $data['user_avatar'];
+                $response = $response . '<tr><td><a href="user_display.php?id=' . $row['post_by'] . '"><strong> ' . $user_name . '</strong></a><br><img style="max-width:100px;max-height:100px" src = "data:image/png;base64,' . base64_encode($user_avatar) . '"/><br>Location: ' . $user_location . '</a><br># of posts: ' . $num_of_posts . '<br>Posted in: ' . $row['post_date'] . '</td>
+                    <td>' . $row['post_content'];
+                //$response = $response . '<br><hr class="post-hr">' . $user_signature . '</td></tr>';
             }
             $response = $response . '</tbody></table>';
 
@@ -162,6 +190,20 @@ class Utils {
         }
     }
 
+    private static function _getUserSignatureByID($user_id) {
+        $res = DBConnection::_executeSelectQuery("SELECT user_signature FROM users WHERE user_id = '" . $user_id . "'");
+        while ($row = mysqli_fetch_array($res)) { //send back result
+            return $row['user_signature'];
+        }
+    }
+
+    private static function _getUserAvatarByID($user_id) {
+        $res = DBConnection::_executeSelectQuery("SELECT user_avatar FROM users WHERE user_id = '" . $user_id . "'");
+        while ($row = mysqli_fetch_array($res)) { //send back result
+            return $row['user_avatar'];
+        }
+    }
+
     public static function getUserIDByName($user_name) {
         $res = DBConnection::_executeSelectQuery("SELECT * FROM users WHERE user_name = '" . $user_name . "'");
         while ($row = mysqli_fetch_array($res)) { //send back result
@@ -169,13 +211,21 @@ class Utils {
         }
     }
 
-    public static function getUserData($user_id) {
+    public static function getUserData($user_id, $bFormatted = false) {
         $num_of_posts = self::_getNumberOfPostsByUserId($user_id);
         $data = self::_getUserData($user_id);
         if (!$data) {
             return false;
         }
-        return '<h3>' . $data['user_name'] . '</h3><strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date'] . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
+        if ($bFormatted) {
+            return $data;
+        }
+        return '<h3>' . $data['user_name'] . '</h3><img style="max-width:100px;max-height:100px" src = "data:image/png;base64,' . base64_encode($data['user_avatar']) . '"/><br><strong>User mail:</strong> ' . $data['user_email'] . '<br><strong>Registration Date:</strong> ' . $data['user_date'] . '<br><strong>Level:</strong> ' . $data['user_level'] . '<br><strong># of posts:</strong> ' . $num_of_posts;
+    }
+
+    public static function setImageToUser($user_name, $image) {
+        $user_id = self::getUserIDByName($user_name);
+        return DBConnection::_executeQuery("UPDATE `users` SET `user_avatar` = '{$image}'  WHERE `user_id` =  '$user_id'");
     }
 
     private static function _getNumberOfPostsByUserId($user_id) {
@@ -198,17 +248,41 @@ class Utils {
                 $data['user_date'] = $row['user_date'];
                 $data['user_level'] = $row['user_level'];
                 $data['user_name'] = $row['user_name'];
+                $data['user_location'] = $row['user_location'];
+                $data['user_signature'] = $row['user_signature'];
+                $data['user_avatar'] = $row['user_avatar'];
                 return $data;
             }
         }
     }
 
     public static function ValidateNewTopic($topic_subject, $topic_content, $user_name, $cat_id) {
-        return true;
+        $return_obj = array("status" => false, "message" => self::TOPIC_EMPTY);
+        if ($topic_subject != "" && $topic_content != "") {
+            $return_obj["status"] = true;
+        }
+        return $return_obj;
     }
 
+    /* Checking last message is not posted by the same user (prevent spam and double posts - except Admins) */
+
     public static function ValidateNewPost($post_content, $user_name, $topic_id) {
-        return true;
+        $return_obj = array("status" => false, "message" => self::DUPLICATE_POST);
+        $res = DBConnection::_executeSelectQuery("SELECT * FROM posts where post_topic = '" . $topic_id . "' ORDER BY post_id DESC LIMIT 1");
+        if ($res === false) {
+            $return_obj["message"] = self::DEFAULT_ERROR_MSG;
+        } else if ($post_content == "") {
+            $return_obj["message"] = self::POST_EMPTY;
+        } else {
+            $current_user_id = self::getUserIDByName($user_name);
+            $row = mysqli_fetch_array($res);
+            $last_post_user_id = $row['post_by'];
+            if ($current_user_id == $last_post_user_id) {
+                return $return_obj;
+            }
+            $return_obj["status"] = true;
+        }
+        return $return_obj;
     }
 
     public static function CreateNewTopic($topic_subject, $topic_content, $user_name, $cat_id) {
