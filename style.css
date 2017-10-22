@@ -47,3 +47,10 @@ btn-default {
 .control-panel-section {
     margin-left: 2%;
 }
+.alert-danger {
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+.forum-display {
+    margin-top: 1%;
+}

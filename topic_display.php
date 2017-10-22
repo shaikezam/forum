@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         '<input type="hidden" name="topic_id" value="' . $topic_id . '" />' .
         '<input type="hidden" name="forum_id" value="' . $cat_id . '" />' .
         '<input type="submit" value="New Post" id="submitLogin" class="btn btn-default" />
-            </form><br>';
+            </form>';
     }
     $posts = Utils::getPosts($cat_id, $topic_id);
     if (!$posts) {

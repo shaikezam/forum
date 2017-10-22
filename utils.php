@@ -89,14 +89,14 @@ class Utils {
 
     public static function getTopics($cat_id) {
 
-        $res = DBConnection::_executeSelectQuery("SELECT * FROM topics WHERE topic_cat = '" . $cat_id . "'");
+        $res = DBConnection::_executeSelectQuery("SELECT * FROM topics WHERE topic_cat = '" . $cat_id . "' order by topic_date DESC");
         if ($res === false) {
             $res = array();
             $res['status'] = 'Error';
             $res['message'] = self::TOPICS_NOT_FOUND;
             return $res;
         } else {
-            $response = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:70%;">Topic</th><th># of posts</th><th>Last post</th></tr></thead><tbody>';
+            $response = '<table class="table table-bordered forum-display"><thead><tr style="background-color:#a7acaf;"><th style = "width:70%;">Topic</th><th># of posts</th><th>Last post</th></tr></thead><tbody>';
             while ($row = mysqli_fetch_array($res)) { //send back result
                 $user_name = self::_getUserByID($row['topic_by']);
                 $num_of_posts = self::_getNumberOfPostsByTopic($row['topic_id']);
@@ -114,12 +114,18 @@ class Utils {
 
     public static function getPosts($cat_id, $topic_id) {
 
-        $res = DBConnection::_executeSelectQuery("SELECT * FROM posts WHERE post_topic = '" . $topic_id . "'");
+        $res = DBConnection::_executeSelectQuery("SELECT DISTINCT topics.topic_subject, posts.post_by, posts.post_date, posts.post_content FROM posts, topics WHERE post_topic = '" . $topic_id . "' and topics.topic_cat = '" . $cat_id . "' and topics.topic_id = '" . $topic_id . "'");
         if ($res === false) {
             return false;
         } else {
-            $response = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:20%;">User</th><th>Post content</th></tr></thead><tbody>';
+            $b_print_subject_once = true;
+            $tmpString = '<table class="table table-bordered"><thead><tr style="background-color:#a7acaf;"><th style = "width:20%;">User</th><th>Post content</th></tr></thead><tbody>';
+            $response = "<h3>";
             while ($row = mysqli_fetch_array($res)) { //send back result
+                if ($b_print_subject_once) {
+                    $b_print_subject_once = false;
+                    $response = $response . $row['topic_subject'] . '</h3>' . $tmpString;
+                }
                 $data = self::_getUserData($row['post_by']);
                 $num_of_posts = self::_getNumberOfPostsByUserId($row['post_by']);
                 $user_name = $data['user_name'];

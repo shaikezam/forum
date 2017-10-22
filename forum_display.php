@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         '<form method="get" action="new_topic.php?id=">' .
         '<input type="hidden" name="id" value="' . $cat_id . '" />' .
         '<input type="submit" value="New Topic" id="submitLogin" class="btn btn-default" />
-            </form><br>';
+            </form>';
     }
     $topics = Utils::getTopics($cat_id);
     if (is_array($topics) && $topics['status'] === 'Error') {
