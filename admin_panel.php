@@ -8,8 +8,8 @@ include_once 'utils.php';
 
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-    if (isset($_SESSION["logged"]) && isset($_SESSION["user_level"])) {
-        if ($_SESSION["user_level"] === Utils::ADMIN) {
+    if (isset($_COOKIE['myforum'])) {
+        if (isset($_COOKIE["user_level"]) && $_COOKIE["user_level"] === Utils::ADMIN) {
             echo '<h3>Users management</h3>
             <h3>Categories management</h3>
             <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#newCategory">New Category</button>

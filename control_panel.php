@@ -8,14 +8,14 @@ include_once 'footer.php';
 include_once 'utils.php';
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-    if (isset($_SESSION["logged"])) {
-        if (isset($_SESSION["user_level"])) {
+    if (isset($_COOKIE['myforum'])) {
+        if (isset($_COOKIE["user_level"]) && $_COOKIE["user_level"] === Utils::ADMIN) {
             echo ' <a href="admin_panel.php">Admin panel </a>';
         }
         echo '<a href="control_panel.php">Control panel </a><a href="logout.php">log out</a>';
 
         /* general suer data */
-        $user_id = Utils::getUserIDByName($_SESSION["logged"]);
+        $user_id = Utils::getUserIDByName($_COOKIE['myforum']);
         $data = Utils::getUserData($user_id);
 
         if (!$data) {
@@ -30,9 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         echo '<button type="button" class="btn btn-default" data-toggle="collapse" data-target="#updateProfile">Update Profile</button>
             <div id="updateProfile" class="collapse control-panel-section"><br>
                 <form method="post" action="">
-                    Email: (' . $data['user_email'] . '): <input type="text" name="category_name" class="form-control" /><br>
-                    Location: (' . $data['user_location'] . '): <input type="text" name="category_description" class="form-control" ><br>
-                        <input type="submit" value="Submit" id="submitRegister" class="btn btn-default" />
+                    Email: (' . $data['user_email'] . '): <input type="email" name="email_input" class="form-control" /><br>
+                    Location: (' . $data['user_location'] . '): <input type="text" name="location_input" class="form-control" ><br>
+                        <input type="submit" value="Submit" id="submitRegister" class="btn btn-default" name="update_profile"/>
                </form>
              </div><br><br>';
 
@@ -70,28 +70,28 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         Utils::ThrowErrorLog(Utils::NOT_AUTHORIZED);
     }
 } else {
-    if (!isset($_SESSION["logged"])) {
+    if (!isset($_COOKIE['myforum'])) {
         header('Location: index.php');
     }
-    if (isset($_POST['category_name']) && isset($_POST['category_description'])) {
-        $category_name = $_POST['category_name'];
-        $category_description = $_POST['category_description'];
-        $res = Utils::createNewCategory($category_name, $category_description);
-        if ($res !== true) {
-            Utils::ThrowErrorLog($res);
-        } else {
-            header('Location: index.php');
+    if (isset($_POST['update_profile'])) { /* Update profle */
+        $new_email = $_POST['email_input'];
+        $new_location = $_POST['location_input'];
+        if ($new_email === '' && $new_location === '') {
+            Utils::ThrowErrorLog(Utils::EMPTY_FIELDS);
+        } if ($new_email !== '') {
+            $res = Utils::updateUserEmail();
+        } if ($new_location !== '') {
+            $res = Utils::updateuserLocation();
         }
-    } else if (isset($_POST['categoryId']) && isset($_POST['categoryAction'])) {
-        $category_id = $_POST['categoryId'];
-        $category_action = $_POST['categoryAction'];
-        $res = Utils::hiddenCategory($category_id, $category_action);
-        if ($res !== true) {
-            Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);
-        } else {
-            header('Location: index.php');
-        }
-    } else if (isset($_POST['upload_file'])) {
+        /* $category_name = $_POST['category_name'];
+          $category_description = $_POST['category_description'];
+          $res = Utils::createNewCategory($category_name, $category_description);
+          if ($res !== true) {
+          Utils::ThrowErrorLog($res);
+          } else {
+          header('Location: index.php');
+          } */
+    } else if (isset($_POST['upload_file'])) { /* Change avatar */
         $target_dir = "uploads/";
         $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
         $uploadOk = 1;
@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
               echo "Sorry, there was an error uploading your file.";
               } */
             $image = addslashes(file_get_contents($_FILES['fileToUpload']['tmp_name']));
-            $res = Utils::setImageToUser($_SESSION["logged"], $image);
+            $res = Utils::setImageToUser($_COOKIE['myforum'], $image);
             if ($res !== true) {
                 Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);
             } else {

@@ -22,7 +22,7 @@ class Utils {
     const NOT_IMAGE = "File is not an image";
     const TOPIC_EMPTY = "New topic must have subject and content";
     const POST_EMPTY = "New post must have content";
-    
+    const EMPTY_FIELDS = 'All fields are empty, try again with data';
     const CHOOSE_CATEGORY = 'Choose Category';
     const VISIBLE = 'Visible';
     const HIDDEN = 'Hidden';
@@ -35,6 +35,7 @@ class Utils {
         echo '<div class="alert alert-danger">' . $str . '</div>';
     }
 
+    /* validate min length of user name, passowrd = password check, user email in email pattern */
     public static function ValidateRegisterDetails($username, $user_pass, $user_pass_check, $user_email, $user_location) {
         if (strlen($username) > self::USER_NAME_MIN_LENGTH && $user_pass === $user_pass_check && filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
             return DBConnection::_executeQuery('INSERT INTO users VALUES (DEFAULT,"' . $username . '", "' . $user_pass . '", "' . $user_email . '", DEFAULT, "Regular", DEFAULT, DEFAULT,"' . $user_location . '")');
@@ -43,6 +44,7 @@ class Utils {
         }
     }
 
+    /* validate uesr name and pass wrod ar the same row and exists */
     public static function ValidateLoginDetails($username, $user_pass) {
         if (strlen($username) > self::USER_NAME_MIN_LENGTH && $user_pass) {
             $res = DBConnection::_executeSelectQuery("SELECT * FROM users where user_name like binary '$username' and user_pass like binary '$user_pass'");
@@ -50,20 +52,20 @@ class Utils {
                 return false;
             } else {
                 while ($row = mysqli_fetch_array($res)) { //send back result
-                    if ($row['user_level'] === self::ADMIN) {
-                        $_SESSION["user_level"] = self::ADMIN;
-                    }
+                    setcookie('user_level', $row['user_level'], time() + 31556926, '/');
                 }
                 return true;
             }
         }
     }
 
+    /* create new category */
     public static function createNewCategory($category_name, $category_description) {
         //return DBConnection::_executeQuery('INSERT INTO categories VALUES (DEFAULT,"' . $category_name . '", "' . $category_description . ', DEFAULT")');
         return DBConnection::_executeQuery('INSERT INTO `categories`(`cat_id`, `cat_name`, `cat_description`, `cat_visible`) VALUES (DEFAULT,"' . $category_name . '","' . $category_description . '", DEFAULT)');
     }
 
+    /* get categories in HTML format */
     public static function getCategories() {
         $res = DBConnection::_executeSelectQuery("SELECT * FROM categories WHERE cat_visible = 1");
         if ($res === false) {
@@ -88,8 +90,11 @@ class Utils {
     }
 
     public static function getTopics($cat_id) {
+        $stat = "SELECT DISTINCT topics.topic_id, topics.topic_subject, topics.topic_date, topics.topic_by, posts.post_date FROM topics, posts
+            WHERE topic_cat = '" . $cat_id . "' and topic_id = post_topic and posts.post_date = (SELECT post_date FROM posts WHERE post_topic = topics.topic_id ORDER BY post_id DESC LIMIT 1)
+            order by post_date DESC";
 
-        $res = DBConnection::_executeSelectQuery("SELECT * FROM topics WHERE topic_cat = '" . $cat_id . "' order by topic_date DESC");
+        $res = DBConnection::_executeSelectQuery($stat);
         if ($res === false) {
             $res = array();
             $res['status'] = 'Error';
@@ -98,6 +103,9 @@ class Utils {
         } else {
             $response = '<table class="table table-bordered forum-display"><thead><tr style="background-color:#a7acaf;"><th style = "width:70%;">Topic</th><th># of posts</th><th>Last post</th></tr></thead><tbody>';
             while ($row = mysqli_fetch_array($res)) { //send back result
+                foreach ($row as $key => $value) {
+                    //echo "$key is at $value <br>";
+                }
                 $user_name = self::_getUserByID($row['topic_by']);
                 $num_of_posts = self::_getNumberOfPostsByTopic($row['topic_id']);
                 $topic_last_post_details = self::_getLastPostDetails($row['topic_id']);
@@ -341,6 +349,17 @@ class Utils {
             return FALSE;
         }
         return DBConnection::_executeQuery("UPDATE `categories` SET `cat_visible` = '$flag'  WHERE `cat_id` =  '$category_id'");
+    }
+
+    public static function logOut() {
+        if (isset($_COOKIE['myforum'])) {
+            unset($_COOKIE['myforum']);
+            setcookie('myforum', null, -1, '/');
+        }
+        if (isset($_COOKIE['user_level'])) {
+            unset($_COOKIE['user_level']);
+            setcookie('user_level', null, -1, '/');
+        }
     }
 
 }

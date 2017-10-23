@@ -13,13 +13,13 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     /* the form hasn't been posted yet, display it
       note that the action="" will cause the form to post to the same page it is on */
 
-    if (!isset($_SESSION["logged"])) {
+    if (!isset($_COOKIE['myforum'])) {
         echo 'Please <a href="login.php">log in</a> or <a href="register.php">register</a><br><br>';
         Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);
         //return;
     } else {
-        echo 'Hello ' . $_SESSION["logged"] . ',<br>';
-        if (isset($_SESSION["user_level"])) {
+        echo 'Hello ' . $_COOKIE['myforum'] . ',<br>';
+        if (isset($_COOKIE["user_level"]) && $_COOKIE["user_level"] === Utils::ADMIN) {
             echo ' <a href="admin_panel.php">Admin panel </a>';
         }
         echo '<a href="control_panel.php">Control panel </a><a href="logout.php">log out</a>' .
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     }
 } else {
     $cat_id = $_GET['id'];
-    $user_name = ($_SESSION["logged"]);
+    $user_name = ($_COOKIE['myforum']);
     $topic_subject = $_POST['topic_subject'];
     $topic_content = $_POST['topic_content'];
     $is_valid = Utils::ValidateNewTopic($topic_subject, $topic_content, $user_name, $cat_id);
