@@ -1,5 +1,5 @@
 <?php
-
+include_once 'utils.php';
 class DBConnection {
 
     protected static $server = 'localhost';
@@ -173,6 +173,9 @@ class DBConnection {
         (4, 'Movies & Series', 'Have you seen a nice movie or a series addict? Share us', 1),
         (5, 'Photography & Graphics', 'Share with us us your photos or artwork', 1),
         (6, 'Gadgets and technology', 'You bought a new TV? Want to consult before buying a computer? New device you found on eBay? Share with us', 1);");
+        
+        Utils::logOut();
+        
     }
 
     /* close DB connection */

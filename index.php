@@ -10,7 +10,6 @@ include_once 'utils.php';
 
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-    echo $_SERVER['REMOTE_ADDR'] . '   ' . $_SERVER['HTTP_USER_AGENT'];
     /* the form hasn't been posted yet, display it
       note that the action="" will cause the form to post to the same page it is on */
     if (!isset($_COOKIE['myforum'])) {
