@@ -13,11 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     /* the form hasn't been posted yet, display it
       note that the action="" will cause the form to post to the same page it is on */
     $cat_id = $_GET['id'];
-    if (!isset($_SESSION["logged"])) {
+    if (isset($_COOKIE["user_level"]) && $_COOKIE["user_level"] === Utils::ADMIN) {
         echo 'Please <a href="login.php">log in</a> or <a href="register.php">register</a><br><br>';
         //return;
     } else {
-        echo 'Hello ' . $_SESSION["logged"] . ',<br>';
+        echo 'Hello ' . $_COOKIE['myforum'] . ',<br>';
         if (isset($_SESSION["user_level"])) {
             echo ' <a href="admin_panel.php">Admin panel </a>';
         }

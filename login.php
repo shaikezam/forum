@@ -1,4 +1,5 @@
 <?php
+
 ob_start();
 session_start();
 include_once 'dbmanager.php';
@@ -13,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     /* the form hasn't been posted yet, display it
       note that the action="" will cause the form to post to the same page it is on */
     //$_SESSION["logged"] = true;
-    if (!isset($_SESSION["logged"])) {
+    if (!isset($_COOKIE['myforum'])) {
         echo '<h3>Sign in</h3>
             <form method="post" action="">
                 Username: <input type="text" name="user_name" class="form-control" /><br>
@@ -30,9 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         $user_pass = $_POST['user_pass'];
         $is_valid = Utils::ValidateLoginDetails($username, $user_pass);
         if ($is_valid === true) {
-            $_SESSION["logged"] = $username;
+            setcookie('myforum', $username, time() + 31556926, '/');
+            //echo $_COOKIE['myforum'];
             header('Location: index.php');
-        } else if ($is_valid === false){
+        } else if ($is_valid === false) {
             Utils::ThrowErrorLog(Utils::USER_NOT_FOUND);
         } else {
             Utils::ThrowErrorLog(Utils::DEFAULT_ERROR_MSG);

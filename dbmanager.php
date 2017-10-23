@@ -53,8 +53,7 @@ class DBConnection {
             }
 
             $db_selected = mysqli_select_db(self::$connectionString, self::getDB());
-            if (!$db_selected) {
-// If we couldn't, then it either doesn't exist, or we can't see it.
+            if (!$db_selected) { /* If data base not found we create it */
                 $sql = 'CREATE DATABASE ' . self::getDB();
                 if (self::$connectionString->query($sql) === TRUE) {
                     echo "Database " . self::getDB() . " created successfully\n";
@@ -62,6 +61,14 @@ class DBConnection {
                     self::_initDataStructure();
                 } else {
                     echo 'Error creating database: ' . mysqli_error() . "\n";
+                }
+            } else { /* If data base found we create data */
+                self::$connectionString = mysqli_connect(self::getServer(), self::getUser(), self::getPassword(), self::getDB());
+                mysqli_query(self::$connectionString, "use" . self::getDB());
+                $result = mysqli_query(self::$connectionString, "show tables");
+                $numResults = mysqli_num_rows($result);
+                if ($numResults === 0) {
+                    self::_initDataStructure();
                 }
             }
         }
@@ -151,10 +158,10 @@ class DBConnection {
     post_by     INT(8) NOT NULL,
     PRIMARY KEY (post_id)
 ) Engine=InnoDB');
-        /*Create admin user and regular user for testing*/
+        /* Create admin user and regular user for testing */
         self::_executeQuery('INSERT INTO users VALUES (DEFAULT, "Admin", "Admin1234", "shaike.zam@gmail.com", DEFAULT, "Admin", "", null, "IL")');
         self::_executeQuery('INSERT INTO users VALUES (DEFAULT, "Shaike", "Shaike1234", "babababa360@gmail.com", DEFAULT, "Regular", "", null, "Tel-Aviv")');
-        
+
         self::_executeQuery('ALTER TABLE ' . self::getDB() . ' topics ADD FOREIGN KEY(topic_cat) REFERENCES  ' . self::getDB() . ' categories(cat_id) ON DELETE CASCADE ON UPDATE CASCADE;');
         self::_executeQuery('ALTER TABLE ' . self::getDB() . ' topics ADD FOREIGN KEY(topic_by) REFERENCES  ' . self::getDB() . ' users(user_id) ON DELETE RESTRICT ON UPDATE CASCADE;');
         self::_executeQuery('ALTER TABLE ' . self::getDB() . ' posts ADD FOREIGN KEY(post_topic) REFERENCES  ' . self::getDB() . ' topics(topic_id) ON DELETE CASCADE ON UPDATE CASCADE;');

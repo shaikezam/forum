@@ -22,7 +22,7 @@ class Utils {
     const NOT_IMAGE = "File is not an image";
     const TOPIC_EMPTY = "New topic must have subject and content";
     const POST_EMPTY = "New post must have content";
-    
+    const EMPTY_FIELDS = 'All fields are empty, try again with data';
     const CHOOSE_CATEGORY = 'Choose Category';
     const VISIBLE = 'Visible';
     const HIDDEN = 'Hidden';
@@ -50,9 +50,7 @@ class Utils {
                 return false;
             } else {
                 while ($row = mysqli_fetch_array($res)) { //send back result
-                    if ($row['user_level'] === self::ADMIN) {
-                        $_SESSION["user_level"] = self::ADMIN;
-                    }
+                    setcookie('user_level', $row['user_level'], time() + 31556926, '/');
                 }
                 return true;
             }
